@@ -1,38 +1,94 @@
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f4f4f4;
+/* Reset button defaults */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  border: none;
 }
 
-h1 {
-  color: #333;
+/* Add Task button - Blue */
+#addBtn {
+  background-color: #3498db !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  min-width: 100px;
+  text-align: center;
 }
 
+/* Hover effect */
+#addBtn:hover {
+  background-color: #2980b9 !important;
+}
+
+/* Clear All button - Red */
+#clearBtn {
+  background-color: #e74c3c !important;
+  color: white !important;
+  padding: 10px 20px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* Hover effect */
+#clearBtn:hover {
+  background-color: #c0392b !important;
+}
+
+/* Input styling */
 input {
   padding: 8px;
   width: 200px;
-}
-
-button {
-  padding: 5px 8px;
-  cursor: pointer;
-  border: none;
-  background: #e74c3c;
-  color: white;
+  border: 1px solid #ccc;
   border-radius: 5px;
+  margin-right: 5px;
 }
 
-button:hover {
-  background: #c0392b;
+/* Task list styling */
+ul#taskList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
 }
 
+/* Task items */
 li {
-  margin: 8px 0;
-  padding: 8px;
-  background: white;
-  border-radius: 5px;
-  cursor: pointer;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 5px;
+}
+
+/* Task text */
+li span {
+  flex: 1;
+  cursor: pointer;
+}
+
+/* Delete buttons */
+li button {
+  background-color: #e74c3c;
+  color: white;
+  padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  border: none;
+  margin-left: 10px;
+}
+
+/* Hover effect for Delete */
+li button:hover {
+  background-color: #c0392b;
+}
+
+/* Task counter */
+#taskCount {
+  margin-top: 10px;
+  font-weight: bold;
 }
