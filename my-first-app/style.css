@@ -1,0 +1,38 @@
+body {
+  font-family: Arial;
+  padding: 20px;
+  background: #f4f4f4;
+}
+
+h1 {
+  color: #333;
+}
+
+input {
+  padding: 8px;
+  width: 200px;
+}
+
+button {
+  padding: 5px 8px;
+  cursor: pointer;
+  border: none;
+  background: #e74c3c;
+  color: white;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #c0392b;
+}
+
+li {
+  margin: 8px 0;
+  padding: 8px;
+  background: white;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
