@@ -2,19 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Task Handler</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <h1>Task Handler</h1>
 
-  <input id="taskInput" placeholder="Enter a task">
-  <button id="addBtn" onclick="addTask()">Add</button>
-  <button id="clearBtn">Clear All</button>
+  <!-- Dark Mode Toggle -->
+  <button id="themeToggle">Dark Mode 🌙</button>
+
+  <div class="input-section">
+    <input id="taskInput" placeholder="Enter a task">
+    <input type="date" id="dueDate">
+
+    <select id="priority">
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+    </select>
+
+    <button id="addBtn" onclick="addTask()">Add</button>
+    <button id="clearBtn">Clear All</button>
+  </div>
 
   <ul id="taskList"></ul>
   <p id="taskCount"></p>
+
+  <!-- EDIT MODAL -->
+  <div id="editModal">
+    <div class="modal-content">
+      <h3>Edit Task</h3>
+
+      <input id="editTaskInput"><br>
+      <input type="date" id="editDueDate"><br>
+
+      <select id="editPriority">
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+      </select><br>
+
+      <button onclick="saveEdit()">Save</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
