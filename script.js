@@ -2,7 +2,15 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let history = JSON.parse(localStorage.getItem("history")) || [];
 let currentEditIndex = null;
 
-// 🌙 THEME
+// 🧠 FIX OLD DATA (IMPORTANT)
+history = history.map(h => {
+  if (!h.uid) {
+    h.uid = crypto.randomUUID();
+  }
+  return h;
+});
+
+// THEME
 const toggleBtn = document.getElementById("themeToggle");
 
 if (localStorage.getItem("theme") === "dark") {
@@ -28,7 +36,7 @@ toggleBtn.addEventListener("click", () => {
   updateThemeButton();
 });
 
-// ================= TASK RENDER =================
+// ================= TASKS =================
 function renderTasks() {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
@@ -36,15 +44,10 @@ function renderTasks() {
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
 
-    if (task.priority === "high") li.style.borderLeft = "5px solid red";
-    else if (task.priority === "medium") li.style.borderLeft = "5px solid orange";
-    else li.style.borderLeft = "5px solid green";
-
     const span = document.createElement("span");
-
     span.textContent = task.text;
 
-    if (task.dueDate) span.textContent += ` (Due: ${task.dueDate})`;
+    if (task.dueDate) span.textContent += ` (${task.dueDate})`;
     if (task.notes) span.textContent += ` - ${task.notes}`;
 
     if (task.completed) {
@@ -61,7 +64,11 @@ function renderTasks() {
       tasks[index].completed = !tasks[index].completed;
 
       if (tasks[index].completed) {
-        history.push({ ...tasks[index], status: "completed" });
+        history.push({
+          ...tasks[index],
+          status: "completed",
+          uid: crypto.randomUUID()
+        });
       }
 
       saveTasks();
@@ -82,13 +89,18 @@ function renderTasks() {
       document.getElementById("editModal").style.display = "block";
     };
 
-    // DELETE
+    // DELETE TASK
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.onclick = (e) => {
       e.stopPropagation();
 
-      history.push({ ...tasks[index], status: "deleted" });
+      history.push({
+        ...tasks[index],
+        status: "deleted",
+        uid: crypto.randomUUID()
+      });
+
       tasks.splice(index, 1);
       saveTasks();
     };
@@ -127,14 +139,6 @@ function renderHistory() {
       const div = document.createElement("div");
       div.className = "history-item";
 
-      const date = item.createdAt
-        ? new Date(item.createdAt).toLocaleDateString()
-        : "Unknown";
-
-      const day = item.createdAt
-        ? new Date(item.createdAt).toLocaleDateString(undefined, { weekday: "long" })
-        : "";
-
       div.innerHTML = `
         <div class="history-title">
           <span>${item.text}</span>
@@ -145,16 +149,31 @@ function renderHistory() {
           <div>Notes: ${item.notes || "None"}</div>
           <div>Due: ${item.dueDate || "None"}</div>
           <div>Priority: ${item.priority || "None"}</div>
-          <div>Created: ${day} ${date}</div>
         </div>
       `;
 
-      div.addEventListener("click", () => {
+      div.addEventListener("click", (e) => {
+        if (e.target.tagName === "BUTTON") return;
+
         const details = div.querySelector(".history-details");
         details.style.display =
           details.style.display === "block" ? "none" : "block";
       });
 
+      // ❌ DELETE FIXED (100% RELIABLE)
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
+
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+
+        history = history.filter(h => h.uid !== item.uid);
+
+        localStorage.setItem("history", JSON.stringify(history));
+        renderHistory();
+      };
+
+      div.appendChild(deleteBtn);
       col.appendChild(div);
     });
 
@@ -179,8 +198,7 @@ function addTask() {
     notes,
     dueDate,
     priority,
-    completed: false,
-    createdAt: new Date().toISOString()
+    completed: false
   });
 
   saveTasks();
@@ -212,14 +230,18 @@ function saveEdit() {
   closeModal();
 }
 
-// ================= EVENTS =================
+// ================= BUTTONS =================
 document.getElementById("clearBtn").addEventListener("click", () => {
-  tasks.forEach(t => history.push({ ...t, status: "deleted" }));
+  tasks.forEach(t => history.push({
+    ...t,
+    status: "deleted",
+    uid: crypto.randomUUID()
+  }));
+
   tasks = [];
   saveTasks();
 });
 
-// 🗑️ CLEAR HISTORY (NEW BUTTON)
 document.getElementById("clearHistoryBtn").addEventListener("click", () => {
   history = [];
   localStorage.setItem("history", JSON.stringify(history));
