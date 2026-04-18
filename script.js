@@ -2,13 +2,15 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let history = JSON.parse(localStorage.getItem("history")) || [];
 let currentEditIndex = null;
 
-// 🧠 FIX OLD DATA (IMPORTANT)
-history = history.map(h => {
-  if (!h.uid) {
-    h.uid = crypto.randomUUID();
-  }
-  return h;
-});
+// 🎨 ONLY 2 COLORS NOW
+const colors = [
+  "#7b2cbf",  // purple
+  "#ff4d8d"   // bright pink
+];
+
+function getTaskColor(index) {
+  return colors[index % 2];
+}
 
 // THEME
 const toggleBtn = document.getElementById("themeToggle");
@@ -44,6 +46,13 @@ function renderTasks() {
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
 
+    // assign persistent color
+    if (!task.color) {
+      task.color = getTaskColor(index);
+    }
+
+    li.style.backgroundColor = task.color;
+
     const span = document.createElement("span");
     span.textContent = task.text;
 
@@ -52,7 +61,7 @@ function renderTasks() {
 
     if (task.completed) {
       span.style.textDecoration = "line-through";
-      span.style.opacity = "0.6";
+      span.style.opacity = "0.7";
     }
 
     // COMPLETE
@@ -160,7 +169,6 @@ function renderHistory() {
           details.style.display === "block" ? "none" : "block";
       });
 
-      // ❌ DELETE FIXED (100% RELIABLE)
       const deleteBtn = document.createElement("button");
       deleteBtn.textContent = "Delete";
 
@@ -168,7 +176,6 @@ function renderHistory() {
         e.stopPropagation();
 
         history = history.filter(h => h.uid !== item.uid);
-
         localStorage.setItem("history", JSON.stringify(history));
         renderHistory();
       };
@@ -198,7 +205,8 @@ function addTask() {
     notes,
     dueDate,
     priority,
-    completed: false
+    completed: false,
+    color: getTaskColor(tasks.length)
   });
 
   saveTasks();
