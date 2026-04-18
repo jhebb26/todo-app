@@ -9,11 +9,15 @@
 
   <h1>Task Handler</h1>
 
-  <!-- Dark Mode Toggle -->
-  <button id="themeToggle">Dark Mode 🌙</button>
+  <!-- TOP RIGHT BUTTONS -->
+  <div class="top-buttons">
+    <button id="themeToggle">Dark Mode 🌙</button>
+    <button id="clearHistoryBtn">Clear History 🗑️</button>
+  </div>
 
   <div class="input-section">
     <input id="taskInput" placeholder="Enter a task">
+    <input id="noteInput" placeholder="Add notes (optional)">
     <input type="date" id="dueDate">
 
     <select id="priority">
@@ -28,6 +32,9 @@
 
   <ul id="taskList"></ul>
   <p id="taskCount"></p>
+
+  <h3>Task History</h3>
+  <div id="historyList"></div>
 
   <!-- EDIT MODAL -->
   <div id="editModal">

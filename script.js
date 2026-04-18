@@ -1,15 +1,14 @@
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let history = JSON.parse(localStorage.getItem("history")) || [];
 let currentEditIndex = null;
 
-// 🌙 DARK MODE
+// 🌙 THEME
 const toggleBtn = document.getElementById("themeToggle");
 
-// Load saved theme
 if (localStorage.getItem("theme") === "dark") {
   document.body.classList.add("dark");
 }
 
-// Update button text
 function updateThemeButton() {
   toggleBtn.textContent = document.body.classList.contains("dark")
     ? "Light Mode ☀️"
@@ -18,7 +17,6 @@ function updateThemeButton() {
 
 updateThemeButton();
 
-// Toggle theme
 toggleBtn.addEventListener("click", () => {
   document.body.classList.toggle("dark");
 
@@ -30,6 +28,7 @@ toggleBtn.addEventListener("click", () => {
   updateThemeButton();
 });
 
+// ================= TASK RENDER =================
 function renderTasks() {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
@@ -42,22 +41,33 @@ function renderTasks() {
     else li.style.borderLeft = "5px solid green";
 
     const span = document.createElement("span");
+
     span.textContent = task.text;
 
-    if (task.dueDate) {
-      span.textContent += ` (Due: ${task.dueDate})`;
-    }
+    if (task.dueDate) span.textContent += ` (Due: ${task.dueDate})`;
+    if (task.notes) span.textContent += ` - ${task.notes}`;
 
     if (task.completed) {
       span.style.textDecoration = "line-through";
       span.style.opacity = "0.6";
     }
 
-    span.onclick = () => {
+    // COMPLETE
+    const completeBtn = document.createElement("button");
+    completeBtn.textContent = "Complete";
+    completeBtn.onclick = (e) => {
+      e.stopPropagation();
+
       tasks[index].completed = !tasks[index].completed;
+
+      if (tasks[index].completed) {
+        history.push({ ...tasks[index], status: "completed" });
+      }
+
       saveTasks();
     };
 
+    // EDIT
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.onclick = (e) => {
@@ -72,77 +82,148 @@ function renderTasks() {
       document.getElementById("editModal").style.display = "block";
     };
 
+    // DELETE
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.onclick = (e) => {
       e.stopPropagation();
+
+      history.push({ ...tasks[index], status: "deleted" });
       tasks.splice(index, 1);
       saveTasks();
     };
 
     li.appendChild(span);
+    li.appendChild(completeBtn);
     li.appendChild(editBtn);
     li.appendChild(delBtn);
+
     list.appendChild(li);
   });
 
   document.getElementById("taskCount").textContent =
     `Tasks remaining: ${tasks.filter(t => !t.completed).length}`;
+
+  renderHistory();
 }
 
+// ================= HISTORY =================
+function renderHistory() {
+  const container = document.getElementById("historyList");
+  container.innerHTML = "";
+
+  const completed = history.filter(h => h.status === "completed");
+  const deleted = history.filter(h => h.status === "deleted");
+
+  function makeColumn(title, items) {
+    const col = document.createElement("div");
+    col.className = "history-column";
+
+    const header = document.createElement("h4");
+    header.textContent = title;
+    col.appendChild(header);
+
+    items.slice().reverse().forEach(item => {
+      const div = document.createElement("div");
+      div.className = "history-item";
+
+      const date = item.createdAt
+        ? new Date(item.createdAt).toLocaleDateString()
+        : "Unknown";
+
+      const day = item.createdAt
+        ? new Date(item.createdAt).toLocaleDateString(undefined, { weekday: "long" })
+        : "";
+
+      div.innerHTML = `
+        <div class="history-title">
+          <span>${item.text}</span>
+          <span>${item.status}</span>
+        </div>
+
+        <div class="history-details">
+          <div>Notes: ${item.notes || "None"}</div>
+          <div>Due: ${item.dueDate || "None"}</div>
+          <div>Priority: ${item.priority || "None"}</div>
+          <div>Created: ${day} ${date}</div>
+        </div>
+      `;
+
+      div.addEventListener("click", () => {
+        const details = div.querySelector(".history-details");
+        details.style.display =
+          details.style.display === "block" ? "none" : "block";
+      });
+
+      col.appendChild(div);
+    });
+
+    return col;
+  }
+
+  container.appendChild(makeColumn("Completed", completed));
+  container.appendChild(makeColumn("Deleted", deleted));
+}
+
+// ================= ADD =================
 function addTask() {
-  const input = document.getElementById("taskInput");
+  const text = document.getElementById("taskInput").value.trim();
+  const notes = document.getElementById("noteInput").value.trim();
   const dueDate = document.getElementById("dueDate").value;
   const priority = document.getElementById("priority").value;
 
-  const text = input.value.trim();
   if (!text) return;
 
   tasks.push({
     text,
-    completed: false,
+    notes,
     dueDate,
-    priority
+    priority,
+    completed: false,
+    createdAt: new Date().toISOString()
   });
-
-  input.value = "";
-  document.getElementById("dueDate").value = "";
 
   saveTasks();
 }
 
+// ================= SAVE =================
 function saveTasks() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("history", JSON.stringify(history));
   renderTasks();
 }
 
+// ================= EDIT =================
 function closeModal() {
   document.getElementById("editModal").style.display = "none";
 }
 
 function saveEdit() {
-  const newText = document.getElementById("editTaskInput").value.trim();
-  const newDate = document.getElementById("editDueDate").value;
-  const newPriority = document.getElementById("editPriority").value;
+  tasks[currentEditIndex].text =
+    document.getElementById("editTaskInput").value;
 
-  if (!newText) return;
+  tasks[currentEditIndex].dueDate =
+    document.getElementById("editDueDate").value;
 
-  tasks[currentEditIndex].text = newText;
-  tasks[currentEditIndex].dueDate = newDate;
-  tasks[currentEditIndex].priority = newPriority;
+  tasks[currentEditIndex].priority =
+    document.getElementById("editPriority").value;
 
   saveTasks();
   closeModal();
 }
 
-// Enter key support
-document.getElementById("taskInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") addTask();
-});
-
+// ================= EVENTS =================
 document.getElementById("clearBtn").addEventListener("click", () => {
+  tasks.forEach(t => history.push({ ...t, status: "deleted" }));
   tasks = [];
   saveTasks();
+});
+
+// 🗑️ CLEAR HISTORY (NEW BUTTON)
+document.getElementById("clearHistoryBtn").addEventListener("click", () => {
+  history = [];
+  localStorage.setItem("history", JSON.stringify(history));
+  renderHistory();
 });
 
 renderTasks();
