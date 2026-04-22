@@ -2,14 +2,11 @@ let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let history = JSON.parse(localStorage.getItem("history")) || [];
 let currentEditIndex = null;
 
-// 🎨 ONLY 2 COLORS NOW
-const colors = [
-  "#7b2cbf",  // purple
-  "#ff4d8d"   // bright pink
-];
-
-function getTaskColor(index) {
-  return colors[index % 2];
+// 🎨 PRIORITY COLORS
+function getPriorityColor(priority) {
+  if (priority === "high") return "#ff4d8d";     // pink
+  if (priority === "medium") return "#f4a261";   // orange
+  return "#7b2cbf";                              // purple (low)
 }
 
 // THEME
@@ -46,12 +43,8 @@ function renderTasks() {
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
 
-    // assign persistent color
-    if (!task.color) {
-      task.color = getTaskColor(index);
-    }
-
-    li.style.backgroundColor = task.color;
+    // 🎨 FULL BOX COLOR BASED ON PRIORITY
+    li.style.backgroundColor = getPriorityColor(task.priority);
 
     const span = document.createElement("span");
     span.textContent = task.text;
@@ -205,8 +198,7 @@ function addTask() {
     notes,
     dueDate,
     priority,
-    completed: false,
-    color: getTaskColor(tasks.length)
+    completed: false
   });
 
   saveTasks();
