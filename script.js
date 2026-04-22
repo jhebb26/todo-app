@@ -4,9 +4,9 @@ let currentEditIndex = null;
 
 // 🎨 PRIORITY COLORS
 function getPriorityColor(priority) {
-  if (priority === "high") return "#ff4d8d";     // pink
-  if (priority === "medium") return "#f4a261";   // orange
-  return "#7b2cbf";                              // purple (low)
+  if (priority === "high") return "#ff4d8d";
+  if (priority === "medium") return "#f4a261";
+  return "#7b2cbf";
 }
 
 // 🌙 THEME
@@ -42,11 +42,8 @@ function renderTasks() {
 
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
-
-    // 🎨 COLOR BASED ON PRIORITY
     li.style.backgroundColor = getPriorityColor(task.priority);
 
-    // LEFT SIDE (TEXT)
     const left = document.createElement("div");
     left.className = "task-left";
 
@@ -64,16 +61,14 @@ function renderTasks() {
 
     left.appendChild(span);
 
-    // RIGHT SIDE (BADGE + BUTTONS)
     const right = document.createElement("div");
     right.className = "task-right";
 
-    // 🔥 PRIORITY BADGE
     const badge = document.createElement("span");
     badge.className = "priority-badge";
     badge.textContent = task.priority.toUpperCase();
 
-    // COMPLETE
+    // ✅ COMPLETE
     const completeBtn = document.createElement("button");
     completeBtn.textContent = "✔";
     completeBtn.onclick = (e) => {
@@ -92,7 +87,7 @@ function renderTasks() {
       saveTasks();
     };
 
-    // EDIT
+    // ✅ EDIT
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
     editBtn.onclick = (e) => {
@@ -107,19 +102,27 @@ function renderTasks() {
       document.getElementById("editModal").style.display = "block";
     };
 
-    // DELETE TASK
+    // ✅ DELETE (FIXED)
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.onclick = (e) => {
       e.stopPropagation();
 
+      const taskToDelete = tasks[index];
+
+      // push to history FIRST
       history.push({
-        ...tasks[index],
+        text: taskToDelete.text,
+        notes: taskToDelete.notes,
+        dueDate: taskToDelete.dueDate,
+        priority: taskToDelete.priority,
         status: "deleted",
         uid: crypto.randomUUID()
       });
 
+      // remove from tasks
       tasks.splice(index, 1);
+
       saveTasks();
     };
 
@@ -130,7 +133,6 @@ function renderTasks() {
 
     li.appendChild(left);
     li.appendChild(right);
-
     list.appendChild(li);
   });
 
@@ -265,6 +267,30 @@ document.getElementById("clearHistoryBtn").addEventListener("click", () => {
   history = [];
   localStorage.setItem("history", JSON.stringify(history));
   renderHistory();
+});
+
+// ================= EASTER EGG =================
+document.addEventListener("DOMContentLoaded", () => {
+  const heart = document.getElementById("loveHeart");
+  const overlay = document.getElementById("loveOverlay");
+
+  if (!heart || !overlay) return;
+
+  heart.addEventListener("dblclick", () => {
+    overlay.classList.add("show");
+
+    for (let i = 0; i < 25; i++) {
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = "💖";
+      h.style.left = Math.random() * 100 + "vw";
+
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 2500);
+    }
+
+    setTimeout(() => overlay.classList.remove("show"), 3000);
+  });
 });
 
 renderTasks();
