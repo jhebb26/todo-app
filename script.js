@@ -9,7 +9,7 @@ function getPriorityColor(priority) {
   return "#7b2cbf";                              // purple (low)
 }
 
-// THEME
+// 🌙 THEME
 const toggleBtn = document.getElementById("themeToggle");
 
 if (localStorage.getItem("theme") === "dark") {
@@ -43,23 +43,39 @@ function renderTasks() {
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
 
-    // 🎨 FULL BOX COLOR BASED ON PRIORITY
+    // 🎨 COLOR BASED ON PRIORITY
     li.style.backgroundColor = getPriorityColor(task.priority);
 
-    const span = document.createElement("span");
-    span.textContent = task.text;
+    // LEFT SIDE (TEXT)
+    const left = document.createElement("div");
+    left.className = "task-left";
 
-    if (task.dueDate) span.textContent += ` (${task.dueDate})`;
-    if (task.notes) span.textContent += ` - ${task.notes}`;
+    let text = task.text;
+    if (task.dueDate) text += ` (${task.dueDate})`;
+    if (task.notes) text += ` - ${task.notes}`;
+
+    const span = document.createElement("span");
+    span.textContent = text;
 
     if (task.completed) {
       span.style.textDecoration = "line-through";
       span.style.opacity = "0.7";
     }
 
+    left.appendChild(span);
+
+    // RIGHT SIDE (BADGE + BUTTONS)
+    const right = document.createElement("div");
+    right.className = "task-right";
+
+    // 🔥 PRIORITY BADGE
+    const badge = document.createElement("span");
+    badge.className = "priority-badge";
+    badge.textContent = task.priority.toUpperCase();
+
     // COMPLETE
     const completeBtn = document.createElement("button");
-    completeBtn.textContent = "Complete";
+    completeBtn.textContent = "✔";
     completeBtn.onclick = (e) => {
       e.stopPropagation();
 
@@ -107,10 +123,13 @@ function renderTasks() {
       saveTasks();
     };
 
-    li.appendChild(span);
-    li.appendChild(completeBtn);
-    li.appendChild(editBtn);
-    li.appendChild(delBtn);
+    right.appendChild(badge);
+    right.appendChild(completeBtn);
+    right.appendChild(editBtn);
+    right.appendChild(delBtn);
+
+    li.appendChild(left);
+    li.appendChild(right);
 
     list.appendChild(li);
   });

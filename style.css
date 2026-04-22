@@ -30,7 +30,7 @@ input, select {
 
 /* BUTTONS */
 button {
-  padding: 8px 12px;
+  padding: 6px 10px;
   margin: 5px;
   border: none;
   border-radius: 5px;
@@ -44,13 +44,34 @@ button {
 li {
   margin: 10px auto;
   padding: 12px;
-  width: 320px;
+  width: 340px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-radius: 8px;
   color: white;
-  transition: 0.2s;
+}
+
+/* LEFT SIDE TEXT */
+.task-left {
+  text-align: left;
+  flex: 1;
+}
+
+/* RIGHT SIDE ACTIONS */
+.task-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* 🔥 PRIORITY BADGE */
+.priority-badge {
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.2);
 }
 
 /* HISTORY */
@@ -121,4 +142,11 @@ body.dark input,
 body.dark select {
   background: #2a2a2a;
   color: white;
+}
+/* 🌸 Cute Title */
+.cute-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 42px;
+  color: #d000fa;
+  margin-top: 20px;
 }
